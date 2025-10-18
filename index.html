@@ -1602,6 +1602,15 @@ searchInput.addEventListener('input', function() {
   // Ejecutar ajuste inicial
   ajustarCentrado();
 });
+  window.addEventListener("load", function() {
+  function sendHeight() {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type: "resize-iframe", height: height }, "*");
+  }
+
+  sendHeight(); // Enviar altura inicial
+  new ResizeObserver(sendHeight).observe(document.body); // Detectar cambios
+});
 </script>
 
 </body>
