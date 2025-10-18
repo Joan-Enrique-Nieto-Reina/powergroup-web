@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chasis Power Group</title>
+
+ <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; min-height: 100%;
+      background-color: transparent;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* === TÍTULO === */
+    h1 {
+      text-align: center;
+      margin: 40px 0 20px 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* === BUSCADOR === */
+   .search-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0 40px 0; /* 20px arriba, 40px abajo */
+    }
+
+    .search-container input {
+      width: 90%;
+      max-width: 400px;
+      padding: 12px 16px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #1a1a1a;
+      color: white;
+      outline: none;
+    }
+
+    /* === GRID DE CHASIS === */
+    .chasis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      justify-content: center;
+      align-items: start;
+      padding: 0 5vw 60px 5vw;
+    }
+
+    .chasis-grid.uno {
+      justify-items: center;
+    }
+
+    /* === TARJETA DE CHASIS === */
+    .chasis-card {
+      position: relative;
+      max-width: 320px;
+      margin: 0 auto;
+      background-color: #151515;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    .chasis-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(0, 196, 255, 1);
+    }
+
+    /* === CINTA NUEVO === */
+    .ribbon-diagonal {
+      position: absolute;
+      top: 18px;
+      left: -40px;
+      width: 180px;
+      height: 36px;
+      background: linear-gradient(90deg, #FFD700, #FFB700);
+      color: #ff0000; /* 🔴 Texto rojo */
+      font-weight: 800;
+      font-style: italic;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 15;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transform: rotate(-45deg) translate(-7px, 2px);
+    }
+
+    /* === CARRUSEL === */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+      border-radius: 10px;
+      background-color: #0d0d0d;
+    }
+
+    .carousel-images {
+      display: flex;
+      transition: transform 0.5s ease;
+      width: 100%;
+      height: 100%;
+    }
+
+    .carousel-images img {
+      width: 100%;
+      height: 240px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0,0,0,0.6);
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+      z-index: 5;
+    }
+
+    .carousel-btn:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .prev-btn { left: 8px; }
+    .next-btn { right: 8px; }
+
+    /* === INFORMACIÓN === */
+    .chasis-info {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #ccc;
+      margin-top: 15px;
+    }
+
+    .chasis-info strong {
+      color: white;
+      font-size: 1rem;
+    }
+
+    /* === MODAL DE IMAGEN === */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(18, 18, 18, 0.97);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      max-width: 70vw;
+      max-height: 80vh;
+      border-radius: 10px;
+      object-fit: contain;
+      transition: transform 0.25s ease;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px; right: 25px;
+      color: white;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .close:hover {
+      color: #00c4ff;
+    }
+
+    /* === CÍRCULOS (DOTS) RGB === */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background-color: #666;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      animation: rgbGlow 3s linear infinite;
+    }
+
+    @keyframes rgbGlow {
+      0% { box-shadow: 0 0 10px red; background-color: red; }
+      25% { box-shadow: 0 0 10px #00ff00; background-color: #00ff00; }
+      50% { box-shadow: 0 0 10px #00bfff; background-color: #00bfff; }
+      75% { box-shadow: 0 0 10px #ff00ff; background-color: #ff00ff; }
+      100% { box-shadow: 0 0 10px red; background-color: red; }
+    }
+
+    @media (max-width: 600px) {
+      .carousel-container, .carousel-images img {
+        height: 200px;
+      }
+    }
+    
+    /* === ESTILO UNIFICADO CON CHASIS PARA ESCRITORIOS === */
+    .escritorio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* min más grande para PC */
+      gap: 40px;
+      justify-content: center;
+      align-items: start;
+      padding: 0 5vw 60px 5vw;
+    }
+
+    /* === TARJETAS DE ESCRITORIO === */
+    .escritorio-card {
+      position: relative;
+      max-width: 420px; /* ligeramente más grande para PC */
+      margin: 0 auto;
+      background-color: #151515; /* gris oscuro igual a las de chasis */
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    /* Hover igual que chasis */
+    .escritorio-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(0, 196, 255, 1);
+    }
+
+    /* === INFO DE ESCRITORIO === */
+    .escritorio-info {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #ccc;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    .escritorio-info strong {
+      color: white;
+      font-size: 1rem;
+    }
+
+    /* === CARRUSEL (usa los mismos estilos base que chasis) === */
+    .escritorio-card .carousel-container {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      overflow: hidden;
+      border-radius: 10px;
+      background-color: #0d0d0d;
+    }
+
+    .escritorio-card .carousel-images {
+      display: flex;
+      transition: transform 0.5s ease;
+      width: 100%;
+      height: 100%;
+    }
+
+    .escritorio-card .carousel-images img {
+      width: 100%;
+      height: 260px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    /* === MEDIA QUERIES RESPONSIVE === */
+    @media (max-width: 768px) {
+      .escritorio-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+        padding: 0 4vw 40px 4vw;
+      }
+
+      .escritorio-card {
+        max-width: 100%;
+        padding: 12px;
+      }
+
+      .escritorio-card .carousel-container {
+        height: 200px;
+      }
+
+      .escritorio-card .carousel-images img {
+        height: 200px;
+      }
+
+      .escritorio-info {
+        font-size: 0.85rem;
+      }
+    }
+    
+    .enfriamiento-card {
+  position: relative;
+  max-width: 320px;
+  margin: 0 auto;
+  background-color: #151515;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 15px;
+  overflow: hidden;
+}
+
+.enfriamiento-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(0, 196, 255, 1);
+}
+
+/* Carrusel e info */
+.enfriamiento-card .carousel-container,
+.enfriamiento-card .carousel-images img,
+.enfriamiento-info {
+  /* se puede heredar igual que .chasis-card y .chasis-info */
+}
+.enfriamiento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  justify-content: center;
+  align-items: start;
+  padding: 0 5vw 60px 5vw;
+}
+
+.enfriamiento-grid.uno {
+  justify-items: center;
+}
+
+/* === PRODUCTOS POWER GROUP === */
+.productos-card {
+  position: relative;
+  max-width: 320px;
+  margin: 0 auto;
+  background-color: #151515;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 15px;
+  overflow: hidden;
+}
+
+.productos-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(0, 196, 255, 1);
+}
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  justify-content: center;
+  align-items: start;
+  padding: 0 5vw 60px 5vw;
+}
+
+.productos-grid.uno {
+  justify-items: center;
+}
+
+/* Carrusel e info (hereda de enfriamiento) */
+.productos-card .carousel-container,
+.productos-card .carousel-images img,
+.productos-info {
+  /* se hereda igual que .enfriamiento-card */
+}
+
+/* === AJUSTE FINAL SOLO PARA SECCIÓN DE ENFRIAMIENTO === */
+#enfriamiento .modal-content {
+  max-width: 28vw;   /* más pequeño: controla el ancho */
+  max-height: 55vh;  /* altura controlada */
+  border-radius: 12px;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  object-fit: contain;
+}
+
+/* Al mostrar el modal (efecto de zoom sutil) */
+#enfriamiento .modal.show .modal-content {
+  transform: scale(1);
+}
+
+/* Solo PC (pantallas grandes) */
+@media (min-width: 1024px) {
+  #enfriamiento .modal-content {
+    max-width: 28vw;   /* menos ancho */
+    max-height: 55vh;  /* menos alto */
+  }
+}
+
+/* Responsivo: en móvil sigue viéndose bien */
+@media (max-width: 768px) {
+  #enfriamiento .modal-content {
+    max-width: 85vw;
+    max-height: 70vh;
+  }
+}
+
+/* === AJUSTE FINAL SOLO PARA SECCIÓN DE PRODUCTOS POWER GROUP === */
+#productos .modal-content {
+  max-width: 30vw;   /* tamaño óptimo para pantallas grandes */
+  max-height: 60vh;
+  border-radius: 12px;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  object-fit: contain;
+}
+
+/* Al mostrar el modal con efecto de zoom */
+#productos .modal.show .modal-content {
+  transform: scale(1);
+}
+
+/* Solo PC (pantallas grandes) */
+@media (min-width: 1024px) {
+  #productos .modal-content {
+    max-width: 30vw;
+    max-height: 60vh;
+  }
+}
+
+/* Móviles y tablets */
+@media (max-width: 768px) {
+  #productos .modal-content {
+    max-width: 85vw;
+    max-height: 70vh;
+  }
+}
+
+.espacio-final {
+  height: 100px; /* Ajusta el valor a tu gusto */
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .espacio-final {
+    height: 60px; /* un poco menos en pantallas pequeñas */
+  }
+}
+
+/* === Ajuste para cuando solo hay una tarjeta visible === */
+.chasis-grid.uno,
+.escritorio-grid.uno,
+.enfriamiento-grid.uno,
+.productos-grid.uno {
+  margin-bottom: 150px; /* Espacio adicional debajo */
+  padding-bottom: 100px; /* Evita que la imagen se corte al ampliar */
+}
+
+/* === Separación adicional entre dots y texto en enfriamiento y productos === */
+.enfriamiento-card .carousel-dots,
+.productos-card .carousel-dots {
+  margin-bottom: 12px; /* espacio extra debajo de los círculos */
+}
+
+.enfriamiento-info,
+.productos-info {
+  margin-top: 12px; /* asegura separación clara */
+}
+
+/* === Ajuste general de tamaño del texto en las tarjetas === */
+.chasis-info,
+.escritorio-info,
+.enfriamiento-info,
+.productos-info {
+  font-size: 0.75rem; /* antes 0.9rem → más pequeño, sin perder legibilidad */
+  line-height: 1.45; /* mantiene buena lectura */
+}
+
+/* === UNIFICAR ESTILO DE LOS TÍTULOS DE TODAS LAS TARJETAS === */
+.chasis-info strong,
+.escritorio-info strong,
+.enfriamiento-info strong,
+.productos-info strong {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  display: inline;       /* evita salto de línea */
+  margin: 0;             /* elimina el espacio extra */
+  padding: 0;
+}
+
+
+</style>
+
+</head>
+
+<body>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Buscar chasis por nombre...">
+  </div>
+  <!-- === SECCIÓN DE CHASIS === -->
+<section id="chasis">
+  <h1>CHASIS POWER GROUP</h1>
+  <div class="chasis-grid" id="chasisGrid">
+    
+    <!-- W82-Black -->
+<div class="chasis-card" data-name="W82 Black">
+  <div class="ribbon-diagonal">NUEVO</div>
+
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760798355/W82_Negr.png" alt="Chasis Power Group W82 Black - Imagen 1">
+      <img src="chasis-w82-2.png" alt="Chasis Power Group W82 Black - Imagen 2">
+      <img src="chasis-w82-3.png" alt="Chasis Power Group W82 Black - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group W82 - Black</strong><br>
+    • Fuente de poder POWER GROUP<br>
+    • Diseño inspirado en caja de cristal, con vidrio templado lateral y frontal<br>
+    • 7 Ventiladores ARGB + Controlador<br>
+    • Medidas: -- x -- x -- cm
+  </div>
+</div>
+
+<!-- W82-White -->
+<div class="chasis-card" data-name="W82 White">
+  <div class="ribbon-diagonal">NUEVO</div>
+
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760798354/W82_Blan.png" alt="Chasis Power Group W82 White - Imagen 1">
+      <img src="chasis-w82white-2.png" alt="Chasis Power Group W82 White - Imagen 2">
+      <img src="chasis-w82white-3.png" alt="Chasis Power Group W82 White - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group W82 - White</strong><br>
+    • Fuente de poder POWER GROUP<br>
+    • Diseño inspirado en caja de cristal, con vidrio templado lateral y frontal<br>
+    • 7 Ventiladores ARGB + Controlador<br>
+    • Medidas: -- x -- x -- cm
+  </div>
+</div>
+
+<!-- W27 -->
+<div class="chasis-card" data-name="W27">
+  <div class="ribbon-diagonal">NUEVO</div>
+
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760798354/W27.png" alt="Chasis Power Group W27 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/W27-b.png" alt="Chasis Power Group W27 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/W27-c.png" alt="Chasis Power Group W27 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group W27</strong><br>
+    • Fuente de poder POWER GROUP<br>
+    • Diseño inspirado en caja de cristal, con vidrio templado lateral y frontal<br>
+    • 5 Ventiladores ARGB + Controlador<br>
+    • Medidas: -- x -- x -- cm
+  </div>
+</div>
+
+<!-- G93 -->
+<div class="chasis-card" data-name="G93">
+   <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799644/G93.png" alt="Chasis Power Group G93 - Imagen 1">
+      <img src="https://i.postimg.cc/3xBcZzfz/G93-b.png" alt="Chasis Power Group G93 - Imagen 2">
+      <img src="https://i.postimg.cc/Dz2hS0Rk/G93-c.png" alt="Chasis Power Group G93 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group G93</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Puertos USB frontales<br>
+    • Medidas: 45 x 18 x 42 cm
+  </div>
+</div>
+
+<!-- L12 -->
+<div class="chasis-card" data-name="L12">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799643/L12.png" alt="Chasis Power Group L12 - Imagen 1">
+      <img src="https://i.postimg.cc/L83HncmC/L12-b.png" alt="Chasis Power Group L12 - Imagen 2">
+      <img src="https://i.postimg.cc/8P7DH4w4/L12-c.png" alt="Chasis Power Group L12 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L12</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Diseño clásico con luz LED azul en el logo<br>
+    • Medidas: 45 x 20 x 36 cm
+  </div>
+</div>
+
+<!-- L29 -->
+<div class="chasis-card" data-name="L29">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799641/L29.png" alt="Chasis Power Group L29 - Imagen 1">
+      <img src="https://i.postimg.cc/tJRf7Jyk/L29-b.png" alt="Chasis Power Group L29 - Imagen 2">
+      <img src="https://i.postimg.cc/9fbyzLjC/L29-c.png" alt="Chasis Power Group L29 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L29</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Malla frontal de corte recto y elegante<br>
+    • Medidas: 42 x 20 x 46 cm
+  </div>
+</div>
+
+<!-- L27 -->
+<div class="chasis-card" data-name="L27">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799640/L27.png" alt="Chasis Power Group L27 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/L27-b.png" alt="Chasis Power Group L27 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/L27-c.png" alt="Chasis Power Group L27 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L27</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Diseño futurista con frontal bordeado en esquinas y líneas verticales rectas, lateral con vidrio templado<br>
+    • Medidas: 36 x 20 x 45 cm
+  </div>
+</div>
+
+<!-- L18 -->
+<div class="chasis-card" data-name="L18">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799640/L18.png" alt="Chasis Power Group L18 - Imagen 1">
+      <img src="https://i.postimg.cc/RFrMcVKh/L18-b.png" alt="Chasis Power Group L18 - Imagen 2">
+      <img src="https://i.postimg.cc/wM9LpNQ1/L18-c.png" alt="Chasis Power Group L18 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L18</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Malla frontal<br>
+    • 4 Ventiladores ARGB + Controlador<br>
+    • Medidas: 42 x 20 x 46 cm
+  </div>
+</div>
+
+<!-- L38 -->
+<div class="chasis-card" data-name="L38">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799638/L38.png" alt="Chasis Power Group L38 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/L38-b.png" alt="Chasis Power Group L38 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/L38-c.png" alt="Chasis Power Group L38 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L38</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Malla frontal de corte recto y elegante<br>
+    • 4 Ventiladores ARGB + Controlador<br>
+    • Medidas: 42 x 20 x 46 cm
+  </div>
+</div>
+
+<!-- L46 -->
+<div class="chasis-card" data-name="L46">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799637/L46.png" alt="Chasis Power Group L46 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/L46-b.png" alt="Chasis Power Group L46 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/L46-c.png" alt="Chasis Power Group L46 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L46</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Malla frontal de corte recto y elegante<br>
+    • 4 ventiladores ARGB + Controlador<br>
+    • Medidas: 42 x 20 x 46 cm
+  </div>
+</div>
+
+<!-- L47 -->
+<div class="chasis-card" data-name="L47">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799636/L47.png" alt="Chasis Power Group L47 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/L47-b.png" alt="Chasis Power Group L47 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/L47-c.png" alt="Chasis Power Group L47 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L47</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Malla frontal de corte recto y elegante<br>
+    • 4 ventiladores ARGB + Controlador<br>
+    • Medidas: 42 x 20 x 46 cm
+  </div>
+</div>
+
+<!-- L48 -->
+<div class="chasis-card" data-name="L48">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799635/L48.png" alt="Chasis Power Group L48 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/L48-b.png" alt="Chasis Power Group L48 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/L48-c.png" alt="Chasis Power Group L48 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group L48</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Malla frontal de corte recto y elegante<br>
+    • 4 ventiladores ARGB + Controlador<br>
+    • Medidas: 42 x 20 x 46 cm
+  </div>
+</div>
+
+<!-- X15 -->
+<div class="chasis-card" data-name="X15">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799634/X15.png" alt="Chasis Power Group X15 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/X15-b.png" alt="Chasis Power Group X15 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/X15-c.png" alt="Chasis Power Group X15 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group X15</strong><br>
+    • Fuente de poder POWER GROUP 350W<br>
+    • Diseño sobrio y elegante<br>
+    • Compuesto por 4 ventiladores ARGB frontales y 1 lateral de vidrio templado + Controlador<br>
+    • Medidas: 35 x 18 x 42 cm
+  </div>
+</div>
+
+<!-- X18 -->
+<div class="chasis-card" data-name="X18">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799633/X18.png" alt="Chasis Power Group X18 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/X18-b.png" alt="Chasis Power Group X18 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/X18-c.png" alt="Chasis Power Group X18 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group X18</strong><br>
+    • Fuente de poder POWER GROUP 350W / 600W<br>
+    • Diseño sólido con malla frontal y corte en las bases de sus columnas laterales<br>
+    • 4 Ventiladores ARGB + Controlador<br>
+    • Medidas: 46 x 23 x 40 cm
+  </div>
+</div>
+
+<!-- XPG -->
+<div class="chasis-card" data-name="XPG">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799631/XPG.png" alt="Chasis Power Group XPG - Imagen 1">
+      <img src="IMAGEN-B" alt="Chasis Power Group XPG - Imagen 2">
+      <img src="IMAGEN-C" alt="Chasis Power Group XPG - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group - XPG</strong><br>
+    • Fuente de poder POWER GROUP 600W<br>
+    • Malla frontal de corte recto y elegante<br>
+    • 4 Ventiladores ARGB + Controlador<br>
+    • Medidas: 42 x 20 x 48 cm
+  </div>
+</div>
+
+<!-- W75 -->
+<div class="chasis-card" data-name="W75">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799631/W75.png" alt="Chasis Power Group W75 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/W75-b.png" alt="Chasis Power Group W75 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/W75-c.png" alt="Chasis Power Group W75 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group W75</strong><br>
+    • Fuente de poder POWER GROUP 600W<br>
+    • Diseño inspirado en caja de cristal, con vidrio templado lateral y frontal<br>
+    • 7 Ventiladores ARGB + Controlador<br>
+    • Medidas: -- x -- x -- cm
+  </div>
+</div>
+
+<!-- W78 -->
+<div class="chasis-card" data-name="W78">
+  <div class="carousel-container">
+    <div class="carousel-images">
+      <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799628/W78.png" alt="Chasis Power Group W78 - Imagen 1">
+      <img src="https://i.postimg.cc/5y1rjvCZ/W78-b.png" alt="Chasis Power Group W78 - Imagen 2">
+      <img src="https://i.postimg.cc/gJGJtT6h/W78-c.png" alt="Chasis Power Group W78 - Imagen 3">
+    </div>
+
+    <button class="carousel-btn prev-btn">&#10094;</button>
+    <button class="carousel-btn next-btn">&#10095;</button>
+  </div>
+
+  <div class="carousel-dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="chasis-info">
+    <strong>Chasis Power Group W78</strong><br>
+    • Fuente de poder POWER GROUP 600W<br>
+    • Diseño inspirado en caja de cristal, con vidrio templado lateral y frontal<br>
+    • 7 Ventiladores ARGB + Controlador<br>
+    • Medidas: -- x -- x -- cm
+  </div>
+</div>
+      <!-- CHASIS POR AGREGAR NUEVOS -->
+
+  </div>
+  </section>
+  
+<!-- === SECCIÓN DE ESCRITORIOS === -->
+<section id="escritorios">
+  <h1>Escritorios Power Group</h1>
+
+  <div class="escritorio-grid">
+    <!-- Escritorio BY-5 -->
+    <div class="escritorio-card" data-name="BY-5">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799627/BY-5.png" alt="Escritorio BY-5 - Imagen 1">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799626/BY-5_Rojo.png" alt="Escritorio BY-5_Rojo - Imagen 2">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799625/BY-5_Negro.png" alt="Escritorio BY-5_Negro - Imagen 3">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="escritorio-info">
+        <strong>Escritorio Power Group BY-5</strong><br>
+        • PORTAVASOS<br>
+        • SOPORTE DE DIADEMA<br>
+        • BASE DE FIBRA DE CARBÓN<br>
+        • TOPES DE SUELO REGULADOR<br>
+        • ILUMINACIÓN LED EN SUS LATERALES<br>
+        • Disponible en: rojo y negro
+      </div>
+    </div>
+
+    <!-- Escritorio AY-1 -->
+    <div class="escritorio-card" data-name="AY-1">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799624/AY.png" alt="Escritorio AY-1 - Imagen 1">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799627/AY-2.png" alt="Escritorio AY-1 - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="escritorio-info">
+        <strong>Escritorio Power Group AY-1</strong><br>
+        • SISTEMA ELÉCTRICO DE ALTURA AJUSTABLE (73–105CM)<br>
+        • PORTAVASOS<br>
+        • SOPORTE DE DIADEMA<br>
+        • BASE DE FIBRA DE CARBÓN<br>
+        • TOPES DE SUELO REGULADOR<br>
+        • ILUMINACIÓN LED EN SUS LATERALES
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- === SECCIÓN DE SISTEMAS DE ENFRIAMIENTO === -->
+<section id="enfriamiento">
+  <h1>Sistemas de Enfriamiento Power Group</h1>
+
+  <div class="enfriamiento-grid">
+     <!-- A200C -->
+    <div class="enfriamiento-card" data-name="A200C">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799618/A200C.png" alt="A200C - Imagen 1">
+          <img src="https://i.postimg.cc/example/AIR-2-2.png" alt="A200C - Imagen 2">
+          <img src="https://i.postimg.cc/example/AIR-2-3.png" alt="A200C - Imagen 3">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="enfriamiento-info">
+        <strong>SISTEMA DE ENFRIAMIENTO A200C</strong><br>
+        • Diseño de Doble Tubo de Cobre<br>
+        • Ventilador de 92 mm con Iluminación LED<br>
+        • Alta Disipación de hasta 95W-100W<br>
+        • Base de Aluminio con Tubos de Cobre<br>
+        • Operación Ultra Silenciosa<br>
+        • Fácil instalación<br>
+      </div>
+    </div>
+    
+    <!-- A-400B -->
+    <div class="enfriamiento-card" data-name="A-400B">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799622/A-400B.png" alt="A-400B - Imagen 1">
+          <img src="https://i.postimg.cc/example/AIR-1-2.png" alt="A-400B - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="enfriamiento-info">
+        <strong>SISTEMA DE ENFRIAMIENTO A-400B</strong><br>
+        • Diseño de Torre Avanzado (Mayor altura y aletas)<br>
+        • 4 Tubos de Calor de Cobre Puro (Contacto Directo)<br>
+        • Ventilador de 120 mm de Alto Rendimiento con Iluminación LED<br>
+        • Conector de 4 Pines PWM con Alta Capacidad de Disipación<br>
+      </div>
+    </div>
+
+    <!-- A400E -->
+    <div class="enfriamiento-card" data-name="A400E">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799620/A400E.png" alt="A400E - Imagen 1">
+          <img src="https://i.postimg.cc/example/AIR-1-2.png" alt="A400E - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="enfriamiento-info">
+        <strong>SISTEMA DE ENFRIAMIENTO A400E</strong><br>
+        • Diseño de Torre Avanzado (Mayor altura y aletas)<br>
+        • 4 Tubos de Calor de Cobre Puro (Contacto Directo)<br>
+        • Ventilador de 120 mm de Alto Rendimiento con Iluminación LED<br>
+        • Conector de 4 Pines PWM con Alta Capacidad de Disipación<br>
+      </div>
+    </div>
+       
+     <!-- A400LF -->
+    <div class="enfriamiento-card" data-name="A400LF">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799620/A400LF.png" alt="A400LF - Imagen 1">
+          <img src="https://i.postimg.cc/example/AIR-1-2.png" alt="A400LF - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="enfriamiento-info">
+        <strong>SISTEMA DE ENFRIAMIENTO A400LF</strong><br>
+        • Diseño Estético Superior con Cubierta Iluminada<br>
+        • Ventilador de 120 mm con Control de Velocidad con Iluminación LED<br>
+        • Flujo de Aire Optimizado para Gaming<br>
+        • Base de Contacto Directo de Alto Rendimiento<br>
+      </div>
+    </div>
+    
+         <!-- A-600-LF-Power-Group -->
+    <div class="enfriamiento-card" data-name="A-600-LF-Power-Group">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799621/A-600LF.png" alt="A-600-LF-Power-Group - Imagen 1">
+          <img src="https://i.postimg.cc/example/AIR-1-2.png" alt="A-600-LF-Power-Group - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="enfriamiento-info">
+        <strong>SISTEMA DE ENFRIAMIENTO A-600-LF-Power-Group</strong><br>
+        • Máxima Disipación Térmica de hasta 150W<br>
+        • Sistema de 6 Heat Pipes de Cobre<br>
+        • Diseño Premium con Cubierta Superior ARGB<br>
+        • Ventilador de 120 mm PWM<br>
+        • Solución Ideal para CPUs de Alto Rendimiento y Overclocking Moderado<br>
+        • Rodamiento Hidráulico para Operación Silenciosa y Larga Vida Útil<br>
+      </div>
+    </div>
+        
+         <!-- LCF-240-CONTROL -->
+    <div class="enfriamiento-card" data-name="LCF-240-CONTROL">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799623/LCF-240_CONTROL.png" alt="LCF-240-CONTROL - Imagen 1">
+          <img src="https://i.postimg.cc/example/AIR-1-2.png" alt="LCF-240-CONTROL - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <!-- 🔵 Dots del carrusel -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="enfriamiento-info">
+        <strong>SISTEMA DE ENFRIAMIENTO LCF-240 + CONTROL</strong><br>
+        • Sistema de Refrigeración Líquida AIO de Alto Rendimiento<br>
+        • Radiador Doble de 240 mm con Doble Ventilador de 120 mm<br>
+        • Iluminación RGB/ARGB Sincronizable en Ventiladores y Bloque mas Control Remoto Incluido<br>
+        • Bloque de Agua con Base de Cobre<br>
+        • Compatible con CPUs de Rendimiento Extremo y Overclocking<br>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<!-- === SECCIÓN DE PRODUCTOS POWER GROUP === -->
+<section id="productos">
+  <h1>PRODUCTOS POWER GROUP</h1>
+
+  <div class="productos-grid">
+    
+    <!-- ZK-159 -->
+    <div class="productos-card" data-name="ZK-159">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799617/ZK-159.png" alt="ZK-159 - Imagen 1">
+          <img src="https://i.postimg.cc/example/producto1-2.png" alt="ZK-159 - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="productos-info">
+        <strong>Silla gamer Power Group - ZK-159</strong><br>
+        • --------------<br>
+        • -----------------<br>
+        • -------------------------<br>
+        • ---------------------------<br>
+      </div>
+    </div>
+    
+ <!-- MAGIC-X4 - X1 -->
+    <div class="productos-card" data-name="MAGIC-X4, MAGIC-X1">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799616/VENTILADOR_MAGIC_X4.png" alt="MAGIC-X4 - Imagen 1">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799617/MAGIC_X1.png" alt="MAGIC-X1 - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="productos-info">
+        <strong>Ventiladores ARGB Magic</strong><br>
+        • --------------<br>
+        • -----------------<br>
+        • -------------------------<br>
+        • ---------------------------<br>
+      </div>
+    </div>
+    
+    <!-- PAD -->
+    <div class="productos-card" data-name="PAD">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799615/PAD_Azul.png" alt="PAD - Imagen 1">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799614/PAD_Rosado.png" alt="PAD - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="productos-info">
+        <strong>PAD Power Group</strong><br>
+        • --------------<br>
+        • -----------------<br>
+        • -------------------------<br>
+        • ---------------------------<br>
+      </div>
+    </div>
+
+    <!-- Camara Web Power Group 1080p -->
+    <div class="productos-card" data-name="Camara Web Power Group 1080p">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/v1760799613/Camara_Web.png" alt="Camara Web Power Group 1080p - Imagen 1">
+          <img src="imagen 2" alt="Camara Web Power Group 1080p - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="productos-info">
+        <strong>Camara Web Power Group 1080p</strong><br>
+        • --------------<br>
+        • -----------------<br>
+        • -------------------------<br>
+        • ---------------------------<br>
+      </div>
+    </div>
+    
+        <!-- SET CABLE -->
+    <div class="productos-card" data-name="SET CABLE">
+      <div class="carousel-container">
+        <div class="carousel-images">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799613/SET_CABLE_2.png" alt="SET CABLE - Imagen 1">
+          <img src="https://res.cloudinary.com/dbicntfy4/image/upload/f_png,q_auto/v1760799613/SET" alt="SET CABLE - Imagen 2">
+        </div>
+        <button class="carousel-btn prev-btn">&#10094;</button>
+        <button class="carousel-btn next-btn">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+
+      <div class="productos-info">
+        <strong>SET-CABLE</strong><br>
+        • --------------<br>
+        • -----------------<br>
+        • -------------------------<br>
+        • ---------------------------<br>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section class="espacio-final"></section>
+
+<!-- MODAL -->
+<div id="imgModal" class="modal">
+  <span class="close" id="closeModal">&times;</span>
+  <img class="modal-content" id="modalImage">
+</div>
+
+<script>
+window.addEventListener('load', function() {
+  // Incluimos todas las tarjetas existentes + nuevas tarjetas de productos
+  const cards = document.querySelectorAll('.chasis-card, .escritorio-card, .enfriamiento-card, .productos-card');
+  const searchInput = document.getElementById('searchInput');
+
+// === BUSCADOR MEJORADO (con detección por sección) ===
+searchInput.addEventListener('input', function() {
+  const filter = searchInput.value.toLowerCase();
+  const sections = document.querySelectorAll('section');
+
+  sections.forEach(section => {
+    const cards = section.querySelectorAll('.chasis-card, .escritorio-card, .enfriamiento-card, .productos-card');
+    let foundInSection = false;
+
+    // --- NUEVO: Detectar coincidencia por nombre de sección ---
+    const sectionName = section.id?.toLowerCase() || "";
+    const keywords = {
+      chasis: ['chasis', 'torre', 'case', 'gabinete'],
+      escritorios: ['escritorio', 'mesa', 'desk', 'setup'],
+      enfriamiento: ['enfriamiento', 'cooler', 'ventilador', 'fan'],
+      productos: ['producto', 'accesorio', 'complemento']
+    };
+
+    let matchSection = false;
+    for (const key in keywords) {
+      if (keywords[key].some(word => filter.includes(word)) && sectionName.includes(key)) {
+        matchSection = true;
+        break;
+      }
+    }
+
+    // --- Filtro individual por tarjeta ---
+    cards.forEach(card => {
+      const name = card.getAttribute('data-name').toLowerCase();
+
+      if ((name.includes(filter) && filter !== "") || matchSection) {
+        card.style.display = '';
+        foundInSection = true;
+      } else if (filter === "") {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // --- Mostrar u ocultar la sección completa ---
+    const title = section.querySelector('h1, h2, h3');
+    if (foundInSection || matchSection) {
+      section.style.display = 'block';
+      if (title) title.style.display = 'block';
+    } else if (filter !== "") {
+      section.style.display = 'none';
+      if (title) title.style.display = 'none';
+    } else {
+      section.style.display = 'block';
+      if (title) title.style.display = 'block';
+    }
+  });
+
+  // Llama al centrado cada vez que cambia la búsqueda
+  ajustarCentrado();
+});
+
+  function ajustarCentrado() {
+    // === Chasis ===
+    const visiblesChasis = Array.from(document.querySelectorAll('.chasis-card')).filter(c => c.style.display !== 'none');
+    const chasisGrid = document.getElementById('chasisGrid');
+    if (chasisGrid) chasisGrid.classList.toggle('uno', visiblesChasis.length === 1);
+
+    // === Enfriamiento ===
+    const visiblesEnfriamiento = Array.from(document.querySelectorAll('.enfriamiento-card')).filter(c => c.style.display !== 'none');
+    const enfriamientoGrid = document.querySelector('.enfriamiento-grid');
+    if (enfriamientoGrid) enfriamientoGrid.classList.toggle('uno', visiblesEnfriamiento.length === 1);
+
+    // === Escritorios ===
+    const visiblesEscritorios = Array.from(document.querySelectorAll('.escritorio-card')).filter(c => c.style.display !== 'none');
+    const escritorioGrid = document.querySelector('.escritorio-grid');
+    if (escritorioGrid) escritorioGrid.classList.toggle('uno', visiblesEscritorios.length === 1);
+
+    // === Productos ===
+    const visiblesProductos = Array.from(document.querySelectorAll('.productos-card')).filter(c => c.style.display !== 'none');
+    const productosGrid = document.querySelector('.productos-grid');
+    if (productosGrid) productosGrid.classList.toggle('uno', visiblesProductos.length === 1);
+  }
+
+  // === MODAL CENTRADO AUTOMÁTICO POR FILA (versión unificada y optimizada) ===
+  const modal = document.getElementById('imgModal');
+  const modalImg = document.getElementById('modalImage');
+  const closeModal = document.getElementById('closeModal');
+
+  function openCenteredOnRow(clickedCard, imgSrc) {
+    modal.style.display = 'flex';
+    modalImg.src = imgSrc;
+
+    const grid = clickedCard.closest('.chasis-grid, .escritorio-grid, .enfriamiento-grid, .productos-grid');
+    const allCards = Array.from(
+      grid.querySelectorAll('.chasis-card, .escritorio-card, .enfriamiento-card, .productos-card')
+    ).filter(c => c.style.display !== 'none');
+
+    const groups = {};
+    const tol = 15;
+    allCards.forEach(c => {
+      const t = Math.round(c.getBoundingClientRect().top);
+      let key = Object.keys(groups).find(k => Math.abs(k - t) <= tol);
+      if (!key) key = t;
+      groups[key] = groups[key] || [];
+      groups[key].push(c);
+    });
+
+    const clickedTop = Math.round(clickedCard.getBoundingClientRect().top);
+    const rowKey = Object.keys(groups).find(k => Math.abs(k - clickedTop) <= tol);
+    const rowCards = groups[rowKey] || [clickedCard];
+
+    const firstRect = rowCards[0].getBoundingClientRect();
+    const lastRect = rowCards[rowCards.length - 1].getBoundingClientRect();
+    const centerX = firstRect.left + (lastRect.right - firstRect.left) / 2;
+    const centerY = firstRect.top + firstRect.height / 2;
+
+    // === Ajuste inteligente según número de elementos en la fila ===
+    const cardsPerRow = rowCards.length;
+
+    let scale = 1.3; // valor por defecto
+    if (cardsPerRow === 2) {
+      // productos o secciones con 2 columnas
+      scale = window.innerWidth <= 768 ? 1.1 : 1.15;
+    } else if (cardsPerRow >= 3) {
+      // secciones con 3 o más columnas
+      scale = window.innerWidth <= 768 ? 1.25 : 1.3;
+    }
+
+    modalImg.style.position = 'fixed';
+    modalImg.style.left = `${centerX}px`;
+    modalImg.style.top = `${centerY + 30}px`;
+    modalImg.style.transform = 'translate(-50%, -50%) scale(1)';
+    modalImg.style.opacity = '0';
+    modalImg.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+    requestAnimationFrame(() => {
+      modalImg.style.opacity = '1';
+      modalImg.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    });
+
+    modal._openedOn = clickedCard;
+  }
+
+  // === Listener para abrir modal ===
+  cards.forEach(card => {
+    const imgs = card.querySelectorAll('img');
+    imgs.forEach(img => {
+      img.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openCenteredOnRow(card, this.src);
+      });
+    });
+  });
+
+  // === Cerrar modal ===
+  function closeCurrentModal() {
+    modalImg.style.opacity = 0;
+    modalImg.style.transform = 'translate(-50%, -50%) scale(1)';
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 250);
+  }
+
+  closeModal.onclick = closeCurrentModal;
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) closeCurrentModal();
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') closeCurrentModal();
+  });
+  window.addEventListener('resize', () => {
+    if (modal.style.display === 'flex' && modal._openedOn) {
+      openCenteredOnRow(modal._openedOn, modalImg.src);
+    }
+  });
+
+  // === CARRUSEL ===
+  cards.forEach(card => {
+    const carousel = card.querySelector('.carousel-images');
+    const images = card.querySelectorAll('.carousel-images img');
+    const dots = card.querySelectorAll('.carousel-dots .dot');
+    const prevBtn = card.querySelector('.prev-btn');
+    const nextBtn = card.querySelector('.next-btn');
+    let index = 0;
+
+    function showImage(n) {
+      index = (n + images.length) % images.length;
+      carousel.style.transform = `translateX(${-index * 100}%)`;
+      dots.forEach(dot => dot.classList.remove('active'));
+      dots[index].classList.add('active');
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => showImage(index - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => showImage(index + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => showImage(i)));
+  });
+
+  // Ejecutar ajuste inicial
+  ajustarCentrado();
+});
+</script>
+
+</body>
+</html>
