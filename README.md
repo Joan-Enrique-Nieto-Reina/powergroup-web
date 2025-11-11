@@ -1,6 +1,6 @@
 # Power Group Web / Productos y servicios – Versión 1.0
 
-Este repositorio contiene el código fuente correspondiente a la página web oficial de **Power Group**, marca propietaria de todos los derechos sobre su contenido, diseño y estructura.
+Este repositorio contiene el código fuente correspondiente a la página web oficial de **Power Group**, marca gamer de **Compuoriente Import And Expor Ltda**, propietaria de todos los derechos sobre su contenido, diseño y estructura.
 
 ## 📦 Estado del proyecto
 Versión **1.0**  
@@ -21,10 +21,11 @@ Todas las imágenes utilizadas en el sitio web están almacenadas en **dos servi
 Estas imágenes se mantienen en **formato PNG** y **calidad original**, para que los clientes o usuarios que lo requieran puedan descargarlas directamente con las mismas características visuales utilizadas en el sitio.
 
 ## ⚠️ Derechos
-Todo el contenido, código, diseño e identidad visual presente en este repositorio pertenece a **Power Group**.  
+Todo el contenido, código, diseño e identidad visual presente en este repositorio pertenece a **Power Group**, marca gamer de **Compuoriente Import And Expor Ltda**.  
 Queda prohibida su reproducción, modificación o distribución sin autorización previa de la marca.
 
 ---
 
 **Desarrollado por JSFRAY**  
-© 2025 Power Group – Todos los derechos reservados.
+© 2025 Power Group – Todos los derechos reservados.  
+Marca gamer de **Compuoriente Import And Expor Ltda.**
