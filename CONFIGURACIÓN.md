@@ -459,7 +459,191 @@ https://res.cloudinary.com/dbicntfy4/image/upload/v1761252258/producto2.png
 </section>
 ```
 
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+# ⚙️ CONFIGURACIÓN DEL SCRIPT PRINCIPAL
+
+Este script controla las **funciones interactivas** del sitio Power Group, incluyendo buscador, modales, carruseles y ajustes automáticos de diseño.
+
 ---
+
+## 📑 ÍNDICE
+1. [Estructura General del Script](#estructura-general)
+2. [Buscador Mejorado](#buscador-mejorado)
+3. [Ajuste Automático del Centrado](#ajuste-de-centrado)
+4. [Modal Centrado (Imágenes Ampliadas)](#modal-centrado)
+5. [Carrusel de Imágenes](#carrusel-de-imágenes)
+6. [Ajuste Automático del Iframe (para GitHub Pages)](#ajuste-iframe)
+7. [Resumen General](#resumen-general)
+
+---
+
+# 🧩 ESTRUCTURA GENERAL
+
+```javascript
+window.addEventListener('load', function() {
+  // Todo el código principal se ejecuta cuando la página termina de cargar
+});
+```
+
+**Explicación:**
+- Usa `window.addEventListener('load')` para **esperar a que el sitio cargue completamente** antes de ejecutar los scripts.
+- Esto evita errores al intentar acceder a elementos del DOM que aún no existen.
+
+---
+
+# 🔍 BUSCADOR MEJORADO
+
+Este bloque permite que el buscador **filtre productos por nombre o por categoría**.
+
+```javascript
+const cards = document.querySelectorAll('.chasis-card, .escritorio-card, .enfriamiento-card, .productos-card');
+const searchInput = document.getElementById('searchInput');
+
+searchInput.addEventListener('input', function() {
+  const filter = searchInput.value.toLowerCase();
+  const sections = document.querySelectorAll('section');
+  ...
+});
+```
+
+**Qué hace:**
+- Captura lo que el usuario escribe en el buscador.
+- Revisa cada **sección** (chasis, escritorios, enfriamiento, productos...).
+- Muestra solo las tarjetas (`card`) que coinciden con la búsqueda.
+
+**Ejemplo de uso:**
+- Si escribes “torre”, el buscador mostrará únicamente los productos dentro de la sección **Chasis** que tengan esa palabra clave.
+
+**Diccionario de búsqueda:**
+```javascript
+const keywords = {
+  chasis: ['chasis', 'torre', 'case', 'gabinete'],
+  escritorios: ['escritorio', 'mesa', 'desk', 'setup'],
+  enfriamiento: ['enfriamiento', 'cooler', 'ventilador', 'fan'],
+  productos: ['producto', 'accesorio', 'complemento']
+};
+```
+Sirve para asociar **palabras relacionadas** con cada categoría y mejorar la detección.
+
+---
+
+# 🧭 AJUSTE DE CENTRADO
+
+Controla el **centrado automático de las tarjetas** cuando solo hay un producto visible en una sección (por ejemplo, después de una búsqueda).
+
+```javascript
+function ajustarCentrado() {
+  const visiblesChasis = Array.from(document.querySelectorAll('.chasis-card')).filter(c => c.style.display !== 'none');
+  const chasisGrid = document.getElementById('chasisGrid');
+  if (chasisGrid) chasisGrid.classList.toggle('uno', visiblesChasis.length === 1);
+  ...
+}
+```
+
+**Qué hace:**
+- Detecta cuántas tarjetas hay visibles en cada sección.
+- Si solo hay una, aplica una clase `.uno` para **centrarla visualmente** en el medio del contenedor.
+
+---
+
+# 🖼️ MODAL CENTRADO (IMÁGENES AMPLIADAS)
+
+Permite que al hacer clic sobre una imagen de producto, **se abra ampliada** en el centro de la pantalla, adaptándose al tamaño del grupo o fila.
+
+```javascript
+function openCenteredOnRow(clickedCard, imgSrc) {
+  modal.style.display = 'flex';
+  modalImg.src = imgSrc;
+  ...
+}
+```
+
+**Explicación:**
+- Calcula la posición exacta del producto (`clickedCard`).
+- Identifica todas las tarjetas en la misma fila.
+- Muestra la imagen centrada **de acuerdo a la fila donde estaba** (efecto natural y profesional).
+- Si el usuario está filtrando por buscador (pocos productos visibles), el zoom es mayor.
+
+**Cierre del modal:**
+```javascript
+closeModal.onclick = closeCurrentModal;
+window.addEventListener('click', e => { if (e.target === modal) closeCurrentModal(); });
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closeCurrentModal(); });
+```
+- Se puede cerrar con clic fuera de la imagen o presionando **ESC**.
+
+---
+
+# 🎠 CARRUSEL DE IMÁGENES
+
+Permite desplazarse entre las imágenes de cada producto (botones o puntos).
+
+```javascript
+cards.forEach(card => {
+  const carousel = card.querySelector('.carousel-images');
+  const images = card.querySelectorAll('.carousel-images img');
+  const dots = card.querySelectorAll('.carousel-dots .dot');
+  const prevBtn = card.querySelector('.prev-btn');
+  const nextBtn = card.querySelector('.next-btn');
+  let index = 0;
+  ...
+});
+```
+
+**Qué hace:**
+- Controla el **slide** de imágenes con botones (`prev`, `next`) o puntos (`dots`).
+- La variable `index` mantiene el número de imagen actual.
+- Usa transformaciones CSS (`translateX`) para mover la galería.
+
+**Ejemplo:**
+```html
+<button class="carousel-btn prev-btn">&#10094;</button>
+<button class="carousel-btn next-btn">&#10095;</button>
+```
+Permiten cambiar de imagen hacia atrás o adelante.
+
+---
+
+# 🌐 AJUSTE IFRAME (PARA GITHUB PAGES O EMBED)
+
+Este bloque final permite que la página **se adapte automáticamente de altura** cuando está embebida en un iframe (por ejemplo, al mostrarse dentro de otro sitio o entorno de pruebas).
+
+```javascript
+window.addEventListener("load", function() {
+  function sendHeight() {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type: "resize-iframe", height: height }, "*");
+  }
+  sendHeight();
+  new ResizeObserver(sendHeight).observe(document.body);
+});
+```
+
+**Qué hace:**
+- Calcula la altura total de la página (`scrollHeight`).
+- Envía ese valor al contenedor padre para **ajustar dinámicamente el tamaño del iframe** y evitar cortes o barras innecesarias.
+
+---
+
+# ✅ RESUMEN GENERAL
+
+| Función | Descripción | Elementos Relacionados |
+| -------- | ------------ | ---------------------- |
+| **Buscador mejorado** | Filtra productos por nombre o categoría | `#searchInput`, `.card`, `section` |
+| **Centrado automático** | Ajusta visualmente la posición de una sola tarjeta | `.uno`, `.grid` |
+| **Modal centrado** | Amplía imágenes de producto | `#imgModal`, `.modalImage` |
+| **Carrusel** | Cambia entre imágenes de cada producto | `.carousel-images`, `.dot`, `.btn` |
+| **Ajuste de iframe** | Recalcula altura para contenedor externo | `ResizeObserver`, `postMessage()` |
+
+---
+
+
+# 🧠 NOTA FINAL
+
+Este script fue **desarrollado por JSFRAY** para el sitio **Power Group**,  
+marca gamer de **Compuoriente Import And Expor Ltda**,  
+garantizando un funcionamiento fluido, adaptativo y optimizado en cada módulo del sitio.
 
 # 🧩 Fin de la Guía
 
