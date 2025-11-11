@@ -6,6 +6,40 @@
 
 ---
 
+⚠️ Nota importante sobre seguridad y actualizaciones.
+
+Este documento no solo explica la estructura y la función de integración del código, sino que también busca dejar claras algunas recomendaciones fundamentales para el mantenimiento del proyecto:
+
+1. Antes de realizar cualquier modificación, es importante probar primero los cambios fuera del repositorio principal de GitHub, preferiblemente en un entorno local o emulador.
+Esto garantiza que el sitio web no sufra caídas ni errores visibles durante una actualización.
+
+2. Siempre mantener un respaldo completo del proyecto antes de subir o modificar archivos en el repositorio.
+Esto evita la pérdida de información o fallos en caso de errores inesperados.
+
+3. Comprender el sistema de versionamiento de GitHub es esencial.
+Gracias al control de versiones, es posible volver a un estado anterior si una actualización causa problemas o genera conflictos.
+Este sistema literalmente puede salvar el proyecto en caso de errores graves.
+
+En resumen, la estabilidad del sitio web de Power Group depende del cuidado en las actualizaciones y de mantener una buena práctica de desarrollo.
+Estas recomendaciones son, hasta el momento, los puntos más importantes a tener siempre presentes.
+
+
+🚧 Nota de desarrollo actual.
+
+Actualmente se está trabajando en la corrección de un error en la vista móvil (pantallas pequeñas).
+En equipos de escritorio (PC) el sistema funciona correctamente, mostrando la previsualización de imágenes sin inconvenientes.
+Sin embargo, en dispositivos móviles todavía persiste un fallo en la visualización al hacer clic sobre la imagen del producto.
+
+El problema está relacionado con la configuración general de tamaños y adaptación de la vista previa, lo que dificulta separar correctamente la función de ajuste para móviles.
+Este detalle se encuentra en desarrollo activo, y se está trabajando en una solución puntual que garantice una visualización fluida y optimizada en todos los dispositivos.
+
+📄 Documento técnico – Power Group / JSFRAY
+Desarrollado por JSFRAY.
+Todos los derechos reservados a Power Group, marca gamer de Compuoriente Import And Expor Ltda.
+
+🗓️ Última actualización: 11 de noviembre de 2025.
+Incluye el agregado de la documentación, análisis de futuras mejoras e implementación técnica.
+
 ## 🧩 Componentes Principales del Código
 
 ---
@@ -637,7 +671,73 @@ window.addEventListener("load", function() {
 | **Ajuste de iframe** | Recalcula altura para contenedor externo | `ResizeObserver`, `postMessage()` |
 
 ---
+Perfecto 👍 Aquí tienes una **explicación lista para copiar y pegar en tu archivo `configuracion.md`**, explicando exactamente la función y propósito del código que me pasaste:
 
+---
+
+## 📦 Integración del Repositorio Principal con el Sitio Web Power Group
+
+Este fragmento de código permite conectar **el sitio web principal alojado en GoDaddy** con el **repositorio de GitHub**, donde se encuentra el código fuente completo de Power Group.
+Debido a que la plataforma GoDaddy tiene limitaciones de espacio y cantidad de líneas de código (alrededor de 1500 líneas), esta integración fue la mejor solución para mantener la estructura funcional y actualizable del proyecto.
+
+El código utiliza un **iframe dinámico** que llama directamente al contenido hospedado en GitHub Pages, asegurando que la página cargue correctamente y se adapte al tamaño del contenido real sin perder diseño ni funcionalidad.
+
+---
+
+### 🧩 Código de integración principal
+
+```html
+<style>
+  .iframe-powergroup {
+    width: 100%;
+    border: none;
+    display: block;
+    min-height: 500px; /* altura inicial mientras carga */
+    transition: height 0.3s ease; /* suaviza el cambio de altura */
+  }
+</style>
+
+<iframe
+  id="iframe-powergroup"
+  class="iframe-powergroup"
+  src="https://joan-enrique-nieto-reina.github.io/powergroup-web/"
+  scrolling="no"
+  loading="lazy"
+  title="Catálogo Power Group">
+</iframe>
+
+<script>
+  // Escuchar mensajes del iframe para ajustar altura automáticamente
+  window.addEventListener('message', function(event) {
+    // Verificar que el mensaje viene del iframe correcto
+    if (event.origin !== 'https://joan-enrique-nieto-reina.github.io') return;
+    
+    if (event.data.type === 'resize-iframe') {
+      const iframe = document.getElementById('iframe-powergroup');
+      iframe.style.height = event.data.height + 'px';
+    }
+  });
+</script>
+```
+
+---
+
+### ⚙️ Funcionamiento
+
+1. **El iframe** carga automáticamente el contenido alojado en GitHub Pages (`powergroup-web`), donde está el código fuente principal del sitio.
+2. **El script de comunicación** entre la página principal y el iframe ajusta la altura de manera automática, recibiendo los datos de tamaño y altura desde GitHub.
+3. Esto permite que el contenido se **autoajuste dinámicamente** sin mostrar barras de desplazamiento y manteniendo el diseño fluido.
+4. En caso de actualizaciones o mejoras en el repositorio, el sitio web en GoDaddy se actualiza **de forma inmediata** sin necesidad de subir los archivos manualmente.
+
+---
+
+### 💡 Nota técnica
+
+* Este método garantiza la comunicación fluida entre ambos entornos (**GoDaddy y GitHub Pages**) sin afectar la velocidad de carga ni la funcionalidad.
+* Es una implementación segura, ya que se valida el origen del mensaje (`event.origin`) antes de realizar cualquier ajuste.
+* Gracias a esta estructura, Power Group puede mantener su sitio completamente operativo, escalable y en constante actualización.
+
+---
 
 # 🧠 NOTA FINAL
 
